@@ -1,0 +1,61 @@
+import tweepy
+from time import sleep
+from selenium import webdriver
+from datetime import datetime
+from threading import Timer
+
+chrome_options = webdriver.ChromeOptions()
+chrome_options.add_argument('--incognito')
+
+## Startup driver in incognito ##
+key = "XXXXXXXXXXXXXX"
+secretKey = "XXXXXXXXXXXXXX"
+token = "XXXXXXXXXXXXXX"
+tokenSecret = "XXXXXXXXXXXXXX"
+auth = tweepy.OAuthHandler(key, secretKey)
+auth.set_access_token(token, tokenSecret)
+api = tweepy.API(auth)
+
+x=datetime.today()
+y=x.replace(day=x.day+1, hour=13, minute=0, second=0, microsecond=0)
+delta_t=y-x
+
+secs=delta_t.seconds+1
+
+def tweet():
+    driver = webdriver.Chrome(executable_path='/Users/pierceolsen/Desktop/chromedriver', options=chrome_options)
+    driver.get("https://marketwatch.com")
+    sleep(3)
+    ## Data Gather ##
+    ticUp1 = driver.find_element_by_xpath("/html/body/section/div[2]/div/div[3]/ul[1]/li[1]/a/span")
+    ticUp2 = driver.find_element_by_xpath("/html/body/section/div[2]/div/div[3]/ul[1]/li[2]/a/span")
+    ticUp3 = driver.find_element_by_xpath("/html/body/section/div[2]/div/div[3]/ul[1]/li[3]/a/span")
+    ticUp4 = driver.find_element_by_xpath("/html/body/section/div[2]/div/div[3]/ul[1]/li[4]/a/span")
+    percUp1 = driver.find_element_by_xpath("/html/body/section/div[2]/div/div[3]/ul[1]/li[1]/a/bg-quote")
+    percUp2 = driver.find_element_by_xpath("/html/body/section/div[2]/div/div[3]/ul[1]/li[2]/a/bg-quote")
+    percUp3 = driver.find_element_by_xpath("/html/body/section/div[2]/div/div[3]/ul[1]/li[3]/a/bg-quote")
+    percUp4 = driver.find_element_by_xpath("/html/body/section/div[2]/div/div[3]/ul[1]/li[4]/a/bg-quote")
+    ticDown1 = driver.find_element_by_xpath("/html/body/section/div[2]/div/div[3]/ul[2]/li[1]/a/span")
+    ticDown2 = driver.find_element_by_xpath("/html/body/section/div[2]/div/div[3]/ul[2]/li[2]/a/span")
+    ticDown3 = driver.find_element_by_xpath("/html/body/section/div[2]/div/div[3]/ul[2]/li[3]/a/span")
+    ticDown4 = driver.find_element_by_xpath("/html/body/section/div[2]/div/div[3]/ul[2]/li[4]/a/span")
+    percDown1 = driver.find_element_by_xpath("/html/body/section/div[2]/div/div[3]/ul[2]/li[1]/a/bg-quote")
+    percDown2 = driver.find_element_by_xpath("/html/body/section/div[2]/div/div[3]/ul[2]/li[2]/a/bg-quote")
+    percDown3 = driver.find_element_by_xpath("/html/body/section/div[2]/div/div[3]/ul[2]/li[3]/a/bg-quote")
+    percDown4 = driver.find_element_by_xpath("/html/body/section/div[2]/div/div[3]/ul[2]/li[4]/a/bg-quote")
+    dow = driver.find_element_by_xpath("/html/body/section/div[2]/div/div[2]/div/div[1]/table/tbody/tr[1]")
+    points = driver.find_element_by_xpath(
+        "/html/body/section/div[2]/div/div[2]/div/div[1]/table/tbody/tr[1]/td[4]/bg-quote")
+    ## Print Tweets ##
+    api.update_status(
+        "Biggest Movers Down Today: \n" + ticDown1.text + " " + percDown1.text + "\n" + ticDown2.text +
+        " " + percDown2.text + "\n" + ticDown3.text + " " + percDown3.text + "\n" + ticDown4.text + " " +
+        percDown4.text + "\n#stockstowatch\n#StockMarket")
+    api.update_status("Biggest Movers Up Today: \n" + ticUp1.text + " " + percUp1.text + "\n" + ticUp2.text + " " +
+                      percUp2.text + "\n" + ticUp3.text + " " + percUp3.text + "\n" + ticUp4.text + " " + percUp4.text
+                      + "\n#stockstowatch\n#StockMarket")
+    api.update_status("One hour before market close: \n" + dow.text + "\n#stockstowatch\n#StockMarket")
+    driver.quit()
+    print("success")
+t = Timer(secs, tweet)
+t.start()
